@@ -1,0 +1,368 @@
+{
+  "name": "Resumen Diario - 286",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "7835b96b-4e3e-4e69-aefd-9257c5e7a5b2",
+      "name": "Schedule Trigger",
+      "retryOnFail": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "Vsk3GCy37wEMpBOS",
+          "mode": "list",
+          "cachedResultName": "registro_devoluciones_final",
+          "cachedResultUrl": "/projects/bDZX16Ft2y6DDQPb/datatables/Vsk3GCy37wEMpBOS"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "fecha_dia",
+              "keyValue": "={{ $now.toFormat('yyyy-MM-dd') }}"
+            }
+          ]
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "4a7a2c0c-a185-4355-a9f9-c4a514e79952",
+      "name": "Get row(s)",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "0533ab75-0ae4-4d57-833f-72d1c5da8006",
+              "leftValue": "={{ $json.id_solicitud }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        368,
+        0
+      ],
+      "id": "a78f368d-095c-4d05-a909-959111b71f1e",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "field": "id_solicitud"
+            },
+            {
+              "aggregation": "sum",
+              "field": "monto"
+            }
+          ]
+        },
+        "fieldsToSplitBy": "ruta",
+        "options": {
+          "outputFormat": "separateItems"
+        }
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        816,
+        -96
+      ],
+      "id": "54727578-1ef1-4b82-a3e2-363e8bb05be6",
+      "name": "Summarize por ruta"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "rutas",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1024,
+        -96
+      ],
+      "id": "c809f1ac-9723-450a-88ea-55571dd98476",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "field": "id_solicitud"
+            },
+            {
+              "aggregation": "sum",
+              "field": "monto"
+            },
+            {
+              "aggregation": "sum",
+              "field": "aprobacion_auto"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        768,
+        32
+      ],
+      "id": "fef92e76-2b9d-4a78-a4df-8b1f671436a1",
+      "name": "Summarize totales"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "edf1093e-05ef-41e1-8da7-9be7eb69115b",
+              "name": "tasa_aprobacion",
+              "value": "={{ $json.count_id_solicitud > 0 ? ($json.sum_aprobacion_auto / $json.count_id_solicitud) * 100 : 0 }}",
+              "type": "number"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        992,
+        32
+      ],
+      "id": "7b0abfa3-eb2b-40ac-b3d9-5d30854077ac",
+      "name": "Calcular tasa"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1232,
+        -32
+      ],
+      "id": "2fbfa085-a885-4646-9fab-624315c1881a",
+      "name": "Unir resumen"
+    },
+    {
+      "parameters": {
+        "fromEmail": "carotavil@gmail.com",
+        "toEmail": "ctavil@usm.cl",
+        "subject": "Resumen diario de devoluciones",
+        "emailFormat": "text",
+        "text": "=RESUMEN DIARIO DE DEVOLUCIONES\n\nRuta: {{ $json.rutas[0].ruta }}\nSolicitudes: {{ $json.rutas[0].count_id_solicitud }}\nMonto: ${{ $json.rutas[0].sum_monto }}\n\nRuta: {{ $json.rutas[1].ruta }}\nSolicitudes: {{ $json.rutas[1].count_id_solicitud }}\nMonto: ${{ $json.rutas[1].sum_monto }}\n\nRuta: {{ $json.rutas[2].ruta }}\nSolicitudes: {{ $json.rutas[2].count_id_solicitud }}\nMonto: ${{ $json.rutas[2].sum_monto }}\n\nTotal solicitudes: {{ $json.count_id_solicitud }}\n\nMonto total: ${{ $json.sum_monto }}\n\nTasa de aprobación automática: {{ $json.tasa_aprobacion }}%",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1424,
+        -32
+      ],
+      "id": "9d12a279-92f0-44ea-b0d4-6f01860e26f5",
+      "name": "Enviar resumen diario",
+      "webhookId": "ce945a73-d47a-4485-93d3-150da1ef2382",
+      "credentials": {
+        "smtp": {
+          "id": "sszLzlDwPgIVlQk7",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "carotavil@gmail.com",
+        "toEmail": "ctavil@usm.cl",
+        "subject": "Resumen diario de devoluciones - Sin solicitudes",
+        "emailFormat": "text",
+        "text": "RESUMEN DIARIO DE DEVOLUCIONES\n\nNo se registraron solicitudes durante la jornada.\n\nSolicitudes: 0\nMonto total: $0\nTasa de aprobación automática: 0%",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        768,
+        208
+      ],
+      "id": "713f58a5-1add-44c3-92ae-6a267c26054e",
+      "name": "Enviar resumen sin solicitudes",
+      "webhookId": "60883e5d-fa1b-4bbd-ada3-b13e87e717ad",
+      "credentials": {
+        "smtp": {
+          "id": "sszLzlDwPgIVlQk7",
+          "name": "SMTP account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s)": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Summarize por ruta",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Summarize totales",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Enviar resumen sin solicitudes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize por ruta": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize totales": {
+      "main": [
+        [
+          {
+            "node": "Calcular tasa",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Unir resumen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calcular tasa": {
+      "main": [
+        [
+          {
+            "node": "Unir resumen",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Unir resumen": {
+      "main": [
+        [
+          {
+            "node": "Enviar resumen diario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar resumen sin solicitudes": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "83e669f0-cedb-414f-b868-961996271353",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "217ba332bde7a0254acea79367a8719b5f005597521d22a1ca44e7d2554ed04e"
+  },
+  "nodeGroups": [],
+  "id": "aKC9S75AAj56Blup",
+  "tags": []
+}

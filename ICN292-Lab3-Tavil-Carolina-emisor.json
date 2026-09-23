@@ -1,0 +1,170 @@
+{
+  "name": "Emisor Solicitudes - 286",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "7a4623c2-7e52-4a79-aceb-63f96489dd45",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "solicitudes",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        320,
+        0
+      ],
+      "id": "51f5e411-32d5-4569-b2c5-af7498983697",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://localhost:5678/webhook/devoluciones-286",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "id_solicitud",
+              "value": "={{ $json.id_solicitud }}"
+            },
+            {
+              "name": "sku",
+              "value": "={{ $json.sku }}"
+            },
+            {
+              "name": "unidades",
+              "value": "={{ $json.unidades }}"
+            },
+            {
+              "name": "monto",
+              "value": "={{ $json.monto }}"
+            },
+            {
+              "name": "dias_desde_compra",
+              "value": "={{ $json.dias_desde_compra }}"
+            },
+            {
+              "name": "estado_producto",
+              "value": "={{ $json.estado_producto }}"
+            },
+            {
+              "name": "email_cliente",
+              "value": "={{ $json.email_cliente }}"
+            }
+          ]
+        },
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 1,
+              "batchInterval": 2000
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        752,
+        0
+      ],
+      "id": "9d1c00b3-7570-4b12-84fd-288ffb714b59",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        544,
+        0
+      ],
+      "id": "fa0dd467-9707-46ef-a2a5-45e57bbac78e",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"solicitudes\": [\n    {\n      \"id_solicitud\": \"DEV-1115\",\n      \"sku\": \"AU-210\",\n      \"unidades\": \"1\",\n      \"monto\": \"19990\",\n      \"dias_desde_compra\": \"3\",\n      \"estado_producto\": \"sin_abrir\",\n      \"email_cliente\": \"cliente1@example.cl\"\n    },\n    {\n      \"id_solicitud\": \"DEV-1116\",\n      \"sku\": \"TE-330\",\n      \"unidades\": \"2\",\n      \"monto\": \"69980\",\n      \"dias_desde_compra\": \"5\",\n      \"estado_producto\": \"abierto_sin_uso\",\n      \"email_cliente\": \"cliente2@example.cl\"\n    },\n    {\n      \"id_solicitud\": \"DEV-1117\",\n      \"sku\": \"HV-050\",\n      \"unidades\": \"1\",\n      \"monto\": \"24990\",\n      \"dias_desde_compra\": \"12\",\n      \"estado_producto\": \"con_fallas\",\n      \"email_cliente\": \"cliente3@example.cl\"\n    },\n    {\n      \"id_solicitud\": \"DEV-1118\",\n      \"sku\": \"MW-150\",\n      \"unidades\": \"1\",\n      \"monto\": \"79990\",\n      \"dias_desde_compra\": \"4\",\n      \"estado_producto\": \"sin_abrir\",\n      \"email_cliente\": \"cliente4@example.cl\"\n    },\n    {\n      \"id_solicitud\": \"DEV-1119\",\n      \"sku\": \"PL-120\",\n      \"unidades\": \"1\",\n      \"monto\": \"45990\",\n      \"dias_desde_compra\": \"25\",\n      \"estado_producto\": \"danado_por_uso\",\n      \"email_cliente\": \"cliente5@example.cl\"\n    },\n    {\n      \"id_solicitud\": \"DEV-1120\",\n      \"sku\": \"AS-260\",\n      \"unidades\": \"1\",\n      \"monto\": \"89990\",\n      \"dias_desde_compra\": \"2\",\n      \"estado_producto\": \"con_fallas\",\n      \"email_cliente\": \"cliente6@example.cl\"\n    },\n    {\n      \"id_solicitud\": \"DEV-1121\",\n      \"sku\": \"LV-330\",\n      \"unidades\": \"1\",\n      \"monto\": \"289990\",\n      \"dias_desde_compra\": \"9\",\n      \"estado_producto\": \"sin_abrir\",\n      \"email_cliente\": \"cliente7@example.cl\"\n    },\n    {\n      \"id_solicitud\": \"DEV-1122\",\n      \"sku\": \"PL-120\",\n      \"unidades\": \"1\",\n      \"monto\": \"45990\",\n      \"dias_desde_compra\": \"2\",\n      \"estado_producto\": \"sin_abrir\",\n      \"email_cliente\": \"cliente8@example.cl\"\n    },\n    {\n      \"id_solicitud\": \"DEV-1123\",\n      \"sku\": \"AU-210\",\n      \"unidades\": \"2\",\n      \"monto\": \"39980\",\n      \"dias_desde_compra\": \"15\",\n      \"estado_producto\": \"danado_por_uso\",\n      \"email_cliente\": \"cliente9@example.cl\"\n    },\n    {\n      \"id_solicitud\": \"DEV-1124\",\n      \"sku\": \"HV-050\",\n      \"unidades\": \"2\",\n      \"monto\": \"49980\",\n      \"dias_desde_compra\": \"1\",\n      \"estado_producto\": \"abierto_sin_uso\",\n      \"email_cliente\": \"cliente10@example.cl\"\n    },\n    {\n      \"id_solicitud\": \"DEV-1125\",\n      \"sku\": \"TE-330\",\n      \"unidades\": \"1\",\n      \"monto\": \"34990\",\n      \"dias_desde_compra\": \"22\",\n      \"estado_producto\": \"sin_abrir\",\n      \"email_cliente\": \"cliente11@example.cl\"\n    },\n    {\n      \"id_solicitud\": \"DEV-1126\",\n      \"sku\": \"MW-150\",\n      \"unidades\": \"1\",\n      \"monto\": \"79990\",\n      \"dias_desde_compra\": \"8\",\n      \"estado_producto\": \"con_fallas\",\n      \"email_cliente\": \"cliente12@example.cl\"    },\n    {\n      \"id_solicitud\": \"DEV-C01\",\n      \"sku\": \"CB-010\",\n      \"unidades\": \"1\",\n      \"monto\": \"9990\",\n      \"dias_desde_compra\": \"1\",\n      \"estado_producto\": \"sin_abrir\",\n      \"email_cliente\": \"control01@example.cl\"\n    },\n    {\n      \"id_solicitud\": \"DEV-C02\",\n      \"sku\": \"LV-330\",\n      \"unidades\": \"1\",\n      \"monto\": \"289990\",\n      \"dias_desde_compra\": \"2\",\n      \"estado_producto\": \"sin_abrir\",\n      \"email_cliente\": \"control02@example.cl\"\n    },\n    {\n      \"id_solicitud\": \"DEV-C03\",\n      \"sku\": \"MW-150\",\n      \"unidades\": \"1\",\n      \"monto\": \"79990\",\n      \"dias_desde_compra\": \"29\",\n      \"estado_producto\": \"abierto_sin_uso\",\n      \"email_cliente\": \"control03@example.cl\"\n    }\n  ]\n}\n ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        176,
+        0
+      ],
+      "id": "df14f785-0e1b-43eb-bfc9-2d822c453e85",
+      "name": "Cargar solicitudes1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Cargar solicitudes1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cargar solicitudes1": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "1f536a62-edfc-4a22-bf5a-6adcac5204b1",
+  "meta": {
+    "instanceId": "217ba332bde7a0254acea79367a8719b5f005597521d22a1ca44e7d2554ed04e"
+  },
+  "nodeGroups": [],
+  "id": "UxTTdl68EWDCUuAZ",
+  "tags": []
+}
